@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>بوابة المدرسة - دخول</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #2c3e50; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>تسجيل الدخول</h2>
+        <input type="text" id="username" placeholder="الاسم الكامل (مثلاً: محمد سعد الظفيري)">
+        <select id="userRole" onchange="document.getElementById('stFields').style.display = (this.value=='student'?'block':'none')">
+            <option value="student">طالب</option>
+            <option value="teacher">مدرس</option>
+        </select>
+        <div id="stFields"><input type="text" id="stClass" placeholder="الفصل (مثلاً: 6/أ)"></div>
+        <button onclick="login()">دخول</button>
+    </div>
+<script>
+    function login() {
+        const user = document.getElementById('username').value;
+        const role = document.getElementById('userRole').value;
+        const cls = document.getElementById('stClass').value;
+        if(!user) return alert("اكتب اسمك");
+        if(role === 'teacher') {
+            if(prompt("كلمة السر:") === "تم اخذ الاذن الرجاء دخولي") {
+                localStorage.setItem('user', user); window.location.href = 'teacher_dashboard.html';
+            } else alert("خطأ");
+        } else {
+            if(!cls) return alert("اكتب فصلك");
+            localStorage.setItem('user', user); localStorage.setItem('class', cls);
+            window.location.href = 'student_dashboard.html';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+/* تنسيقات عامة */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-image: url('https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1000');
+    /* خلفية افتراضية */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    transition: 0.5s;
+    /* حركة ناعمة عند تغيير الخلفية */
+}
+
+.overlay {
+    background: rgba(0, 0, 0, 0.6);
+    /* طبقة تغبيش سوداء عشان الكلام يوضح */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 350px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #34495e;
+}
+
+.settings {
+    margin-top: 20px;
+    font-size: 12px;
+}

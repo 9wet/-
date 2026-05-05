@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة المدرس</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f4f9;
+            padding: 20px;
+        }
+
+        .box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        input,
+        select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background: #27ae60;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box" style="border-right: 5px solid #e67e22;">
+        <h2>إضافة (واجب) أو (اختبار جديد)</h2>
+        <select id="mType">
+            <option value="واجب">واجب منزلي</option>
+            <option value="اختبار">تحديد اختبار</option>
+        </select>
+        <input type="text" id="mSub" placeholder="المادة">
+        <input type="text" id="mFrom" placeholder="من صفحة">
+        <input type="text" id="mTo" placeholder="إلى صفحة">
+        <input type="text" id="mDesc" placeholder="ملاحظات إضافية">
+        <br>
+        <strong>موجه إلى:</strong>
+        <select id="mTarget">
+            <option value="all">الكل</option>
+            <option value="class">فصل محدد</option>
+            <option value="private">طالب محدد</option>
+        </select>
+        <input type="text" id="mTargetVal" placeholder="اسم الفصل أو الطالب">
+        <button onclick="addMission()">إرسال المهمة</button>
+    </div>
+
+    <div class="box">
+        <h2>الطلاب المسجلين ودرجاتهم</h2>
+        <input type="text" id="sN" placeholder="اسم الطالب">
+        <input type="text" id="sC" placeholder="الفصل">
+        <button
+            onclick="students.push({name:document.getElementById('sN').value, cls:document.getElementById('sC').value, s:0, m:0, sh:0, x:0}); render();">إضافة
+            طالب</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>الطالب</th>
+                    <th>الفصل</th>
+                    <th>سلوك</th>
+                    <th>مواظبة</th>
+                    <th>مشاركة</th>
+                    <th>اختبار</th>
+                    <th>المجموع</th>
+                </tr>
+            </thead>
+            <tbody id="sBody"></tbody>
+        </table>
+        <button style="width:100%; margin-top:10px; background:#2980b9" onclick="save()">حفظ البيانات</button>
+    </div>
+
+    <script>
+        let students = JSON.parse(localStorage.getItem('stDB')) || [];
+        let missions = JSON.parse(localStorage.getItem('msDB')) || [];
+
+        function addMission() {
+            missions.push({
+                type: document.getElementById('mType').value,
+                sub: document.getElementById('mSub').value,
+                from: document.getElementById('mFrom').value,
+                to: document.getElementById('mTo').value,
+                desc: document.getElementById('mDesc').value,
+                tType: document.getElementById('mTarget').value,
+                tVal: document.getElementById('mTargetVal').value,
+                id: Date.now()
+            });
+            alert("تم الإرسال"); save();
+        }
+
+        function render() {
+            const b = document.getElementById('sBody'); b.innerHTML = '';
+            students.forEach((st, i) => {
+                let total = Number(st.s) + Number(st.m) + Number(st.sh) + Number(st.x);
+                b.innerHTML += `<tr><td>${st.name}</td><td>${st.cls}</td>
+            <td><input type="number" style="width:40px" value="${st.s}" onchange="students[${i}].s=this.value;render()"></td>
+            <td><input type="number" style="width:40px" value="${st.m}" onchange="students[${i}].m=this.value;render()"></td>
+            <td><input type="number" style="width:40px" value="${st.sh}" onchange="students[${i}].sh=this.value;render()"></td>
+            <td><input type="number" style="width:40px" value="${st.x}" onchange="students[${i}].x=this.value;render()"></td>
+            <td>${total}</td></tr>`;
+            });
+        }
+
+        function save() {
+            localStorage.setItem('stDB', JSON.stringify(students));
+            localStorage.setItem('msDB', JSON.stringify(missions));
+        }
+        render();
+    </script>
+</body>
+
+</html>
