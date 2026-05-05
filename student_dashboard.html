@@ -1,105 +1,75 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <title>منصة الطالب</title>
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #eef2f3;
-            padding: 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border-right: 8px solid #27ae60;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .exam-card {
-            border-right-color: #e74c3c;
-            background: #fff5f5;
-        }
-
-        .done-btn {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 5px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            float: left;
-        }
-
-        .tag {
-            font-size: 11px;
-            padding: 3px 7px;
-            border-radius: 4px;
-            color: white;
-            margin-left: 5px;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; border-right: 8px solid #27ae60; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .exam-card { border-right-color: #e74c3c; background: #fff5f5; }
+        .done-btn { background: #27ae60; color: white; border: none; padding: 5px 15px; border-radius: 5px; cursor: pointer; float: left; }
+        .tag { font-size: 11px; padding: 3px 7px; border-radius: 4px; color: white; margin-left: 5px; }
+        .info-box { background: #2c3e50; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
     </style>
 </head>
-
 <body>
-    <h1 id="userTitle">أهلاً بك</h1>
-    <div id="grades" style="background:#2c3e50; color:white; padding:15px; border-radius:10px; margin-bottom:20px;">
+    <div class="info-box">
+        <h1 id="userTitle" style="margin:0">أهلاً بك</h1>
+        <p id="grades" style="margin:10px 0 0 0; font-size: 18px;"></p>
     </div>
 
-    <h3>المهام والواجبات النشطة:</h3>
+    <h3>المهام الدراسية:</h3>
     <div id="list"></div>
 
-    <script>
-        const user = localStorage.getItem('user');
-        const cls = localStorage.getItem('class');
-        const students = JSON.parse(localStorage.getItem('stDB')) || [];
-        let missions = JSON.parse(localStorage.getItem('msDB')) || [];
-        let solved = JSON.parse(localStorage.getItem('solvedTasks_' + user)) || [];
+    <button onclick="window.location.href='index.html'" style="width:100%; margin-top:20px; padding:10px; background:#95a5a6; color:white; border:none; border-radius:5px; cursor:pointer;">تسجيل خروج</button>
 
-        document.getElementById('userTitle').innerText = "الطالب: " + user + " (فصل " + cls + ")";
+<script>
+    const user = localStorage.getItem('user');
+    const idNum = localStorage.getItem('idNum');
+    const cls = localStorage.getItem('class');
+    const students = JSON.parse(localStorage.getItem('stDB')) || [];
+    let missions = JSON.parse(localStorage.getItem('msDB')) || [];
+    let solved = JSON.parse(localStorage.getItem('solved_' + idNum)) || [];
 
-        // عرض الدرجات
-        const myD = students.find(s => s.name === user);
-        if (myD) {
-            document.getElementById('grades').innerHTML = `سلوك: ${myD.s} | مواظبة: ${myD.m} | مشاركة: ${myD.sh} | اختبار: ${myD.x} <br> <b>المجموع: ${Number(myD.s) + Number(myD.m) + Number(myD.sh) + Number(myD.x)}</b>`;
-        }
+    document.getElementById('userTitle').innerText = `الطالب: ${user} | الهوية: ${idNum}`;
 
-        function renderTasks() {
-            const list = document.getElementById('list'); list.innerHTML = '';
+    // عرض الدرجات
+    const myD = students.find(s => s.idNum === idNum);
+    if(myD) {
+        let total = Number(myD.s)+Number(myD.m)+Number(myD.sh)+Number(myD.x);
+        document.getElementById('grades').innerHTML = `سلوك: ${myD.s} | مواظبة: ${myD.m} | مشاركة: ${myD.sh} | اختبار: ${myD.x} <br> <b>المجموع: ${total}</b>`;
+    }
 
-            // الفلترة: (عام) أو (نفس فصلي) أو (اسمي الشخصي) + استبعاد اللي تم حله
-            const myMissions = missions.filter(m => {
-                const isTarget = (m.tType === 'all') || (m.tType === 'class' && m.tVal === cls) || (m.tType === 'private' && m.tVal === user);
-                return isTarget && !solved.includes(m.id);
-            });
+    function renderTasks() {
+        const list = document.getElementById('list'); list.innerHTML = '';
+        
+        const myMissions = missions.filter(m => {
+            const isTarget = (m.tType === 'all') || (m.tType === 'class' && m.tVal === cls) || (m.tType === 'private' && m.tVal === user);
+            return isTarget && !solved.includes(m.id);
+        });
 
-            myMissions.forEach(m => {
-                const isExam = m.type === 'اختبار';
-                list.innerHTML += `
+        myMissions.forEach(m => {
+            const isExam = m.type === 'اختبار';
+            list.innerHTML += `
                 <div class="card ${isExam ? 'exam-card' : ''}">
                     <button class="done-btn" onclick="markSolved(${m.id})">تم الحل ✓</button>
                     <span class="tag" style="background:${isExam ? '#e74c3c' : '#27ae60'}">${m.type}</span>
                     <h3>المادة: ${m.sub}</h3>
-                    <p><b>التحديد:</b> من صفحة ${m.from} إلى صفحة ${m.to}</p>
+                    <p><b>النطاق:</b> من صفحة ${m.from} إلى صفحة ${m.to}</p>
                     <p><b>ملاحظة:</b> ${m.desc}</p>
                 </div>
             `;
-            });
-            if (myMissions.length === 0) list.innerHTML = "لا توجد مهام جديدة.";
-        }
+        });
+        if(myMissions.length === 0) list.innerHTML = "<p>لا توجد واجبات أو اختبارات حالياً.</p>";
+    }
 
-        function markSolved(id) {
-            solved.push(id);
-            localStorage.setItem('solvedTasks_' + user, JSON.stringify(solved));
-            renderTasks();
-        }
-
+    function markSolved(id) {
+        solved.push(id);
+        localStorage.setItem('solved_' + idNum, JSON.stringify(solved));
         renderTasks();
-    </script>
-</body>
+    }
 
+    renderTasks();
+</script>
+</body>
 </html>
