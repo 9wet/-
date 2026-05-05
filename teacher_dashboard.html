@@ -2,57 +2,97 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>لوحة المدرس - إدارة الهويات</title>
+    <title>لوحة المدرس</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f4f9; padding: 20px; }
-        .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .box { background: white; padding: 20 :px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 20px; cursor: pointer; border-radius: 5px; border: none; background: #27ae60; color: white; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
         th { background: #34495e; color: white; }
-        input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
+    <div class="box" style="border-right: 5px solid #e67e22;">
+        <h2>إرسال واجب أو اختبار</h2>
+        <select id="mType">
+            <option value="واجب">واجب منزلي</option>
+            <option value="اختبار">تحديد اختبار</option>
+        </select>
+        <input type="text" id="mSub" placeholder="المادة">
+        <input type="text" id="mFrom" placeholder="من صفحة">
+        <input type="text" id="mTo" placeholder="إلى صفحة">
+        <input type="text" id="mDesc" placeholder="ملاحظات">
+        <br>
+        <strong>الهدف:</strong>
+        <select id="mTarget">
+            <option value="all">الكل</option>
+            <option value="class">فصل محدد</option>
+            <option value="private">طالب محدد (بالاسم)</option>
+        </select>
+        <input type="text" id="mTargetVal" placeholder="اسم الفصل أو الطالب">
+        <button onclick="addMission()">إرسال</button>
+    </div>
+
     <div class="box">
-        <h2>قائمة الطلاب المسجلين (أرقام الهويات)</h2>
+        <h2>إدارة الطلاب المسجلين</h2>
         <table>
             <thead>
                 <tr>
-                    <th>اسم الطالب</th>
+                    <th>الطالب</th>
                     <th>رقم الهوية</th>
                     <th>الفصل</th>
                     <th>سلوك</th>
                     <th>مواظبة</th>
+                    <th>مشاركة</th>
+                    <th>اختبار</th>
                     <th>المجموع</th>
                 </tr>
             </thead>
             <tbody id="sBody"></tbody>
         </table>
-        <button style="margin-top:10px; background:#2980b9; color:white; padding:10px; border:none; border-radius:5px; cursor:pointer;" onclick="save()">حفظ التعديلات</button>
+        <button style="width:100%; margin-top:10px; background:#2980b9" onclick="save()">حفظ جميع التعديلات</button>
     </div>
 
 <script>
-    // ملاحظة: في نظام حقيقي، الطلاب يظهرون هنا بمجرد تسجيل دخولهم
     let students = JSON.parse(localStorage.getItem('stDB')) || [];
+    let missions = JSON.parse(localStorage.getItem('msDB')) || [];
+
+    function addMission() {
+        missions.push({
+            type: document.getElementById('mType').value,
+            sub: document.getElementById('mSub').value,
+            from: document.getElementById('mFrom').value,
+            to: document.getElementById('mTo').value,
+            desc: document.getElementById('mDesc').value,
+            tType: document.getElementById('mTarget').value,
+            tVal: document.getElementById('mTargetVal').value,
+            id: Date.now()
+        });
+        save(); alert("تم الإرسال بنجاح");
+    }
 
     function render() {
         const b = document.getElementById('sBody'); b.innerHTML = '';
         students.forEach((st, i) => {
-            let total = Number(st.s)+Number(st.m);
+            let total = Number(st.s)+Number(st.m)+Number(st.sh)+Number(st.x);
             b.innerHTML += `<tr>
                 <td>${st.name}</td>
-                <td style="color:blue; font-weight:bold">${st.idNum || 'غير مسجل'}</td>
+                <td style="color:blue">${st.idNum}</td>
                 <td>${st.cls}</td>
-                <td><input type="number" value="${st.s}" onchange="students[${i}].s=this.value;render()"></td>
-                <td><input type="number" value="${st.m}" onchange="students[${i}].m=this.value;render()"></td>
-                <td>${total}</td>
+                <td><input type="number" style="width:45px" value="${st.s}" onchange="students[${i}].s=this.value;render()"></td>
+                <td><input type="number" style="width:45px" value="${st.m}" onchange="students[${i}].m=this.value;render()"></td>
+                <td><input type="number" style="width:45px" value="${st.sh}" onchange="students[${i}].sh=this.value;render()"></td>
+                <td><input type="number" style="width:45px" value="${st.x}" onchange="students[${i}].x=this.value;render()"></td>
+                <td style="font-weight:bold">${total}</td>
             </tr>`;
         });
     }
 
     function save() {
         localStorage.setItem('stDB', JSON.stringify(students));
-        alert("تم الحفظ");
+        localStorage.setItem('msDB', JSON.stringify(missions));
     }
     render();
 </script>
