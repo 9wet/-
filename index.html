@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>بوابة المدرسة - تسجيل الدخول</title>
+    <title>بوابة المدرسة - دخول</title>
     <style>
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #2c3e50; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .card { background: white; padding: 30px; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
@@ -40,6 +40,14 @@
             } else alert("خطأ في كلمة السر");
         } else {
             if(!idNum || !cls) return alert("أكمل بيانات الهوية والفصل");
+            
+            // تسجيل الطالب تلقائياً في قاعدة البيانات ليظهر عند المدرس
+            let db = JSON.parse(localStorage.getItem('stDB')) || [];
+            if(!db.find(s => s.idNum === idNum)) {
+                db.push({name: user, idNum: idNum, cls: cls, s:0, m:0, sh:0, x:0});
+                localStorage.setItem('stDB', JSON.stringify(db));
+            }
+
             localStorage.setItem('user', user); 
             localStorage.setItem('idNum', idNum); 
             localStorage.setItem('class', cls);
